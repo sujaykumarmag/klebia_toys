@@ -8,19 +8,24 @@ const Toys = require('../models/Toy');
 // @route       :   GET/api/v1/toys
 // @access      :   Private
 exports.getToys = asyncHandler(async (req, res) => {
+    console.log(req.query);
     if (req.query) {
         const reQuery = { ...req.query };
         reQuery.user = req.user.id;
-        const query = await Toys.find(reQuery.tags);
+        const query = await Toys.find(reQuery);
         if (!query) {
             throw new Error('No Toys are in The DB according to Search')
         }
+        res.status(200).json({ success: true, data: query });
+    } else {
+        const toys = await Toys.find({ user: req.user.id });
+        if (!toys) {
+            throw new Error('No Toys are in The DB')
+        }
+        res.status(200).json({ success: true, data: toys });
     }
-    const toys = await Toys.find({ user: req.user.id });
-    if (!toys) {
-        throw new Error('No Toys are in The DB')
-    }
-    res.status(200).json({ success: true, data: toys });
+    
+    
 })
 
 // @description :   Create a new Toy for this user
